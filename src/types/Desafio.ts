@@ -1,9 +1,8 @@
 export type Desafio = {
     titulo: string;
-    area: 'fisico' | 'mental' | 'espiritual';
+    area: "fisico" | "mental" | "espiritual";
     data: string;
     concluido: boolean;
-    dificuldade?: 'facil' | 'medio' | 'dificil';
     duracao?: number;
     descricao?: string;
     xp?: number;
@@ -12,8 +11,7 @@ export type Desafio = {
 
 export type DesafioTemplate = {
     titulo: string;
-    area: 'fisico' | 'mental' | 'espiritual';
-    dificuldade: 'facil' | 'medio' | 'dificil';
+    area: "fisico" | "mental" | "espiritual";
     duracao: number;
     descricao: string;
     xp: number;
@@ -52,4 +50,4 @@ export interface RelatorioSemanal {
         total: number;
         concluidos: number;
     }>;
-} 
+}

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import type { ChangeEvent } from "react";
 import { getLevelInfo } from "../../components/utils/LevelSystem";
+import { levelSystem } from "../../components/utils/LevelSystem";
 import { StyledBackground } from "../../components/Background/styles";
 import { Footer } from "../../components/Footer/Footer";
 import { Header } from "../../components/Header/Header";
@@ -8,10 +9,11 @@ import * as S from "./styles";
 import { CheckBoxInput } from "../../components/CheckBox/ExempleCheckBox";
 import { StyledInput } from "../../components/utils/utils";
 import type { Desafio, DesafioTemplate } from "../../types/Desafio";
-import { getDesafiosSugeridos, calcularTaxaConclusao, gerarRelatorioSemanal } from "../../components/utils/DesafioSystem";
+import { getDesafiosSugeridos, gerarRelatorioSemanal } from "../../components/utils/DesafioSystem";
 import { PomodoroTimer } from "../../components/Pomodoro/PomodoroTimer";
 import { RelatorioSemanal } from "../../components/Relatorio/RelatorioSemanal";
 import { Button } from "../../components/Button/Button";
+import { checkDailyChallengeLimit, checkAllAreasLimit, DAILY_CHALLENGE_LIMIT } from "../../components/utils/DesafioLimits";
 
 interface FormData {
     nome: string;
@@ -58,13 +60,11 @@ export default function PaginaInicial() {
         area: "fisico" | "mental" | "espiritual";
         descricao: string;
         duracao: number;
-        dificuldade: "facil" | "medio" | "dificil";
     }>({
         titulo: "",
         area: "fisico",
         descricao: "",
         duracao: 15,
-        dificuldade: "facil",
     });
     const [desafiosSugeridos, setDesafiosSugeridos] = useState<DesafioTemplate[]>([]);
     const [feedback, setFeedback] = useState({
@@ -81,19 +81,6 @@ export default function PaginaInicial() {
         mental: "#ff9800",
         espiritual: "#ed88ff",
     };
-
-    const levelSystem = [
-        { level: 1, name: "Iniciante", xpNeeded: 0, description: "Começando sua jornada de evolução" },
-        { level: 2, name: "Aprendiz", xpNeeded: 200, description: "Aprendendo os fundamentos do desenvolvimento pessoal" },
-        { level: 3, name: "Novato", xpNeeded: 500, description: "Estabelecendo bases sólidas para o crescimento" },
-        { level: 4, name: "Intermediário", xpNeeded: 1000, description: "Equilibrando corpo, mente e espírito" },
-        { level: 5, name: "Avançado", xpNeeded: 2000, description: "Dominando técnicas avançadas de autodesenvolvimento" },
-        { level: 6, name: "Especialista", xpNeeded: 4000, description: "Aprofundando conhecimentos em todas as áreas" },
-        { level: 7, name: "Profissional", xpNeeded: 8000, description: "Alcançando excelência em suas práticas" },
-        { level: 8, name: "Expert", xpNeeded: 16000, description: "Referência em desenvolvimento pessoal" },
-        { level: 9, name: "Lendário", xpNeeded: 32000, description: "Inspirando outros com sua jornada" },
-        { level: 10, name: "Mestre", xpNeeded: 64000, description: "Atingiu o mais alto nível de maestria" },
-    ];
 
     useEffect(() => {
         const emailAtual = localStorage.getItem("usuario_atual");
@@ -126,12 +113,9 @@ export default function PaginaInicial() {
 
     useEffect(() => {
         if (desafios && formData) {
-            // Calcula a taxa de conclusão dos últimos 7 dias
-            const taxaConclusao = calcularTaxaConclusao(desafios);
-
-            // Obtém novos desafios sugeridos se não houver nenhum
+            // Calcula a taxa de conclusão dos últimos 7 dias            // Obtém novos desafios sugeridos se não houver nenhum
             if (desafiosSugeridos.length === 0) {
-                const sugestoes = getDesafiosSugeridos(Math.floor(formData.xp / 100), formData.areas, desafios, taxaConclusao);
+                const sugestoes = getDesafiosSugeridos();
                 if (sugestoes !== null) {
                     setDesafiosSugeridos(sugestoes);
                 } else {
@@ -159,26 +143,44 @@ export default function PaginaInicial() {
         };
 
         setDesafios(novosDesafios);
-        localStorage.setItem(`${email}_desafios`, JSON.stringify(novosDesafios));
-
-        // Atualiza XP apenas quando conclui o desafio (não remove XP ao desmarcar)
+        localStorage.setItem(`${email}_desafios`, JSON.stringify(novosDesafios)); // Atualiza XP apenas quando conclui o desafio (não remove XP ao desmarcar)
         if (!estavaConcluido) {
             const formDataAtual = JSON.parse(localStorage.getItem(`${email}_formData`) || "{}");
-            const xpGanho = novosDesafios[index].xp || 10; // usa o XP definido ou 10 como padrão
+            let xpGanho = 15; // XP fixo por completar um desafio
+
+            // Verifica quantidade de desafios completos hoje para bônus
+            const hoje = new Date().toISOString().split("T")[0];
+            const desafiosCompletosHoje = novosDesafios.filter((d) => d.concluido && d.data === hoje).length;
+
+            // Bônus por quantidade de desafios completos
+            if (desafiosCompletosHoje === 6) {
+                xpGanho += 15; // Bônus por 6 desafios
+                setMensagem(`Parabéns! Você completou 6 desafios hoje e ganhou +15 XP de bônus!`);
+                setTimeout(() => {
+                    setMensagem(`Você ganhou ${xpGanho} XP! (15 do desafio + 15 do bônus)`);
+                    setTimeout(() => setMensagem(""), 3000);
+                }, 3000);
+            } else if (desafiosCompletosHoje === 9) {
+                xpGanho += 25; // Bônus por 9 desafios
+                setMensagem(`Parabéns! Você completou 9 desafios hoje e ganhou +25 XP de bônus!`);
+                setTimeout(() => {
+                    setMensagem(`Você ganhou ${xpGanho} XP! (15 do desafio + 25 do bônus)`);
+                    setTimeout(() => setMensagem(""), 3000);
+                }, 3000);
+            } else {
+                setMensagem(`Parabéns! Você ganhou ${xpGanho} XP!`);
+                setTimeout(() => setMensagem(""), 3000);
+            }
+
             const novoXP = (formDataAtual.xp || 0) + xpGanho;
             const novoFormData = { ...formDataAtual, xp: novoXP };
             localStorage.setItem(`${email}_formData`, JSON.stringify(novoFormData));
             setFormData(novoFormData);
             window.dispatchEvent(new Event("usuarioAtualizado"));
-
-            setMensagem(`Parabéns! Você ganhou ${xpGanho} XP!`);
-            setTimeout(() => setMensagem(""), 3000);
         }
     };
 
     const handleEnviarFeedback = () => {
-        // Aqui você pode implementar o envio do feedback para um backend
-        // Por enquanto, vamos só mostrar uma mensagem de sucesso
         setMensagem("Feedback enviado com sucesso! Obrigado por contribuir!");
         setTimeout(() => setMensagem(""), 3000);
 
@@ -193,12 +195,17 @@ export default function PaginaInicial() {
     const handleAdicionarDesafio = (desafio: DesafioTemplate) => {
         if (!desafios || !email) return;
 
+        if (!checkDailyChallengeLimit(desafios, desafio.area)) {
+            setMensagem(`Limite de ${DAILY_CHALLENGE_LIMIT} desafios por área por dia atingido!`);
+            setTimeout(() => setMensagem(""), 3000);
+            return;
+        }
+
         const novoDesafio: Desafio = {
             titulo: desafio.titulo,
             area: desafio.area,
             data: new Date().toISOString().split("T")[0],
             concluido: false,
-            dificuldade: desafio.dificuldade,
             duracao: desafio.duracao,
             descricao: desafio.descricao,
             xp: desafio.xp,
@@ -229,8 +236,7 @@ export default function PaginaInicial() {
 
         // Se todos foram adicionados, tenta gerar novas sugestões
         if (todosAdicionados) {
-            const taxaConclusao = calcularTaxaConclusao(novosDesafios);
-            const novasSugestoes = getDesafiosSugeridos(Math.floor(formData.xp / 100), formData.areas, novosDesafios, taxaConclusao);
+            const novasSugestoes = getDesafiosSugeridos();
             console.log("Novas sugestões:", novasSugestoes);
             if (novasSugestoes !== null) {
                 setDesafiosSugeridos(novasSugestoes);
@@ -270,11 +276,17 @@ export default function PaginaInicial() {
                     <div>
                         {levelSystem.map((level, index) => {
                             const nextLevel = levelSystem[index + 1];
-                            const isCompleted = currentXP >= (nextLevel?.xpNeeded || level.xpNeeded);
                             const isActive = level.level === currentLevel;
                             const xpForThisLevel = level.xpNeeded;
-                            const xpForNextLevel = nextLevel?.xpNeeded || level.xpNeeded;
-                            const xpProgress = isCompleted ? 100 : isActive ? ((currentXP - xpForThisLevel) / (xpForNextLevel - xpForThisLevel)) * 100 : 0;
+                            const xpForNextLevel = nextLevel ? nextLevel.xpNeeded : level.xpNeeded;
+                            const isCompleted = currentXP >= xpForNextLevel || (level.level === 10 && currentXP >= level.xpNeeded);
+                            const xpProgress = isCompleted
+                                ? 100
+                                : isActive
+                                ? ((currentXP - xpForThisLevel) / (xpForNextLevel - xpForThisLevel)) * 100
+                                : currentXP >= xpForThisLevel
+                                ? 100
+                                : 0;
 
                             return (
                                 <S.LevelCard key={level.level} isActive={isActive} isCompleted={isCompleted}>
@@ -286,13 +298,18 @@ export default function PaginaInicial() {
                                         <div style={{ marginTop: "1rem" }}>
                                             <S.ProgressBar progress={xpProgress} color={isActive ? "#a78bfa" : isCompleted ? "#10b981" : "#4b5563"} />
                                             <div className="level-info">
-                                                <span>
-                                                    {isCompleted
-                                                        ? "✨ Nível Completo!"
-                                                        : isActive
-                                                        ? `📊 ${currentXP} / ${xpForNextLevel} XP`
-                                                        : `🎯 ${xpForNextLevel - xpForThisLevel} XP necessários`}
-                                                </span>
+                                                {level.level === 10 ? (
+                                                    <span style={{ color: isCompleted ? "#10b981" : "inherit" }}>
+                                                        {isCompleted ? "✨ " : ""}
+                                                        {currentXP} XP totais acumulados
+                                                    </span>
+                                                ) : isCompleted ? (
+                                                    <span style={{ color: "#10b981" }}>✨ Nível Completo!</span>
+                                                ) : isActive ? (
+                                                    <span>📊 {currentXP} / {xpForNextLevel} XP</span>
+                                                ) : (
+                                                    <span>🎯 Necessários {xpForNextLevel - xpForThisLevel} XP</span>
+                                                )}
                                                 {isActive && <span style={{ color: "#a78bfa" }}>Nível Atual</span>}
                                             </div>
                                         </div>
@@ -443,21 +460,21 @@ export default function PaginaInicial() {
             case "desafios": {
                 const hoje = new Date().toISOString().split("T")[0];
                 const desafiosAtivos = desafios?.filter((d) => !d.concluido) || [];
-
                 const handleCriarDesafio = () => {
                     if (!desafios || !email) return;
 
-                    const xpPorDificuldade = {
-                        facil: 10,
-                        medio: 20,
-                        dificil: 30,
-                    };
+                    if (!checkDailyChallengeLimit(desafios, novoDesafio.area)) {
+                        setMensagem(`Você já criou ${DAILY_CHALLENGE_LIMIT} desafios nesta área hoje! Tente outra área ou volte amanhã.`);
+                        setTimeout(() => setMensagem(""), 5000);
+                        setNovoDesafioModalAberto(false);
+                        return;
+                    }
 
                     const desafioCriado: Desafio = {
                         ...novoDesafio,
                         data: hoje,
                         concluido: false,
-                        xp: xpPorDificuldade[novoDesafio.dificuldade],
+                        xp: 15,
                     };
 
                     const novosDesafios = [...desafios, desafioCriado];
@@ -480,7 +497,6 @@ export default function PaginaInicial() {
                         area: "fisico",
                         descricao: "",
                         duracao: 15,
-                        dificuldade: "facil",
                     });
                 };
 
@@ -499,8 +515,13 @@ export default function PaginaInicial() {
                                 <div>
                                     <h3>Desafios Ativos</h3>
                                     <p style={{ opacity: 0.8 }}>Seus desafios em andamento</p>
-                                </div>
-                                <Button variant="primary" onClick={() => setNovoDesafioModalAberto(true)}>
+                                </div>{" "}
+                                <Button
+                                    variant="primary"
+                                    onClick={() => setNovoDesafioModalAberto(true)}
+                                    disabled={checkAllAreasLimit(desafios)}
+                                    title={checkAllAreasLimit(desafios) ? "Você já alcançou o limite de 3 desafios em cada área hoje" : "Criar novo desafio"}
+                                >
                                     <span>+</span> Novo Desafio
                                 </Button>
                             </div>
@@ -708,8 +729,15 @@ export default function PaginaInicial() {
                                     Que tal criar seus próprios desafios personalizados?
                                     <br />
                                     Continue sua jornada de evolução criando desafios que se adequem às suas necessidades!
-                                </p>
-                                <Button variant="primary" size="medium" onClick={() => setNovoDesafioModalAberto(true)} style={{ marginTop: "1.5rem" }}>
+                                </p>{" "}
+                                <Button
+                                    variant="primary"
+                                    size="medium"
+                                    onClick={() => setNovoDesafioModalAberto(true)}
+                                    style={{ marginTop: "1.5rem" }}
+                                    disabled={checkAllAreasLimit(desafios)}
+                                    title={checkAllAreasLimit(desafios) ? "Limite diário de desafios atingido em todas as áreas" : "Criar novo desafio"}
+                                >
                                     Criar Novo Desafio
                                 </Button>
                             </div>
@@ -882,69 +910,6 @@ export default function PaginaInicial() {
                                         />
                                     </div>
 
-                                    <div style={{ marginBottom: "1.5rem" }}>
-                                        <label style={{ display: "block", marginBottom: "0.5rem" }}>Dificuldade:</label>
-                                        <select
-                                            value={novoDesafio.dificuldade}
-                                            onChange={(e) =>
-                                                setNovoDesafio((prev) => ({
-                                                    ...prev,
-                                                    dificuldade: e.target.value as "facil" | "medio" | "dificil",
-                                                }))
-                                            }
-                                            style={{
-                                                width: "100%",
-                                                padding: "0.8rem",
-                                                background: "rgba(255, 255, 255, 0.1)",
-                                                border: "1px solid rgba(255, 255, 255, 0.2)",
-                                                borderRadius: "8px",
-                                                color: "white",
-                                                fontSize: "1rem",
-                                                cursor: "pointer",
-                                                outline: "none",
-                                                appearance: "none",
-                                                backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`,
-                                                backgroundRepeat: "no-repeat",
-                                                backgroundPosition: "right 1rem center",
-                                                backgroundSize: "1em",
-                                            }}
-                                        >
-                                            <option
-                                                value="facil"
-                                                style={{
-                                                    background: "#1a1a1a",
-                                                    color: "white",
-                                                    padding: "0.8rem",
-                                                    fontSize: "1rem",
-                                                }}
-                                            >
-                                                Fácil (10 XP)
-                                            </option>
-                                            <option
-                                                value="medio"
-                                                style={{
-                                                    background: "#1a1a1a",
-                                                    color: "white",
-                                                    padding: "0.8rem",
-                                                    fontSize: "1rem",
-                                                }}
-                                            >
-                                                Médio (20 XP)
-                                            </option>
-                                            <option
-                                                value="dificil"
-                                                style={{
-                                                    background: "#1a1a1a",
-                                                    color: "white",
-                                                    padding: "0.8rem",
-                                                    fontSize: "1rem",
-                                                }}
-                                            >
-                                                Difícil (30 XP)
-                                            </option>
-                                        </select>
-                                    </div>
-
                                     <div style={{ display: "flex", gap: "1rem", justifyContent: "flex-end" }}>
                                         <Button variant="secondary" onClick={() => setNovoDesafioModalAberto(false)}>
                                             Cancelar
@@ -1086,10 +1051,9 @@ export default function PaginaInicial() {
                                 gap: "0.5rem",
                             }}
                         >
-                            <li>• Mantenha uma rotina consistente</li>
-                            <li>• Alterne entre áreas diferentes</li>
-                            <li>• Use o timer para manter foco</li>
-                            <li>• Celebre cada nível alcançado</li>
+                            <li>• Mantenha uma rotina consistente</li> <li>• Alterne entre áreas diferentes (limite de 3 desafios por área)</li>
+                            <li>• Use o timer para manter o foco</li>
+                            <li>• Celebre seu progresso diário</li>
                         </ul>
 
                         <h4 style={{ marginTop: "1.5rem" }}>Próximo Nível</h4>
@@ -1121,8 +1085,7 @@ export default function PaginaInicial() {
                             <li>
                                 • <strong>Concluir:</strong> Marque o checkbox ao completar
                             </li>
-                        </ul>
-
+                        </ul>{" "}
                         <h4 style={{ marginTop: "1.5rem" }}>Sistema de XP</h4>
                         <ul
                             style={{
@@ -1133,12 +1096,12 @@ export default function PaginaInicial() {
                                 gap: "0.5rem",
                             }}
                         >
-                            <li>• Fácil: 10 XP</li>
-                            <li>• Médio: 20 XP</li>
-                            <li>• Difícil: 30 XP</li>
-                            <li>• Bônus de criação: +5 XP</li>
+                            {" "}
+                            <li>• Cada desafio concluído: 15 XP</li>
+                            <li>• Bônus por 6 desafios/dia: +15 XP</li>
+                            <li>• Bônus por 9 desafios/dia: +25 XP</li>
+                            <li>• Bônus por criar um desafio: +5 XP</li>
                         </ul>
-
                         <h4 style={{ marginTop: "1.5rem" }}>Timer Pomodoro</h4>
                         <p>Ciclos de 25 minutos de foco, seguidos por 5 minutos de pausa. A cada 4 ciclos, faça uma pausa maior de 15 minutos.</p>
                     </div>

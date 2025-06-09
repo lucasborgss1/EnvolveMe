@@ -31,7 +31,7 @@ export const StyledNav = styled.nav`
                 border-radius: 8px;
                 font-family: "Anybody Variable", system-ui;
                 font-weight: 500;
-                
+
                 &:hover {
                     background: rgba(109, 40, 217, 0.2);
                     color: #7c3aed;
@@ -153,11 +153,11 @@ export const ProgressBar = styled.div<{ progress: number; color: string }>`
     overflow: hidden;
 
     &::after {
-        content: '';
+        content: "";
         display: block;
-        width: ${props => props.progress}%;
+        width: ${(props) => props.progress}%;
         height: 100%;
-        background: ${props => props.color};
+        background: ${(props) => props.color};
         transition: width 0.3s ease;
     }
 `;
@@ -292,7 +292,7 @@ export const HistoricoItem = styled.div<{ concluido: boolean }>`
     display: flex;
     justify-content: space-between;
     align-items: center;
-    opacity: ${props => props.concluido ? 1 : 0.7};
+    opacity: ${(props) => (props.concluido ? 1 : 0.7)};
 
     &:hover {
         background: rgba(255, 255, 255, 0.08);
@@ -303,8 +303,8 @@ export const HistoricoStatus = styled.span<{ concluido: boolean }>`
     padding: 0.25rem 0.75rem;
     border-radius: 12px;
     font-size: 0.875rem;
-    background: ${props => props.concluido ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)'};
-    color: ${props => props.concluido ? '#10b981' : '#ef4444'};
+    background: ${(props) => (props.concluido ? "rgba(16, 185, 129, 0.2)" : "rgba(239, 68, 68, 0.2)")};
+    color: ${(props) => (props.concluido ? "#10b981" : "#ef4444")};
 `;
 
 export const DesafioCard = styled.div`
@@ -370,8 +370,8 @@ export const LevelModal = styled.div`
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.8);
-    backdrop-filter: blur(5px);
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -379,20 +379,23 @@ export const LevelModal = styled.div`
 `;
 
 export const LevelContent = styled.div`
-    background: #1a1a1a;
+    background: rgba(26, 26, 26, 0.95);
     border-radius: 16px;
     padding: 2rem;
     width: 90%;
-    max-width: 600px;
-    max-height: 80vh;
+    max-width: 800px;
+    max-height: 85vh;
     overflow-y: auto;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
     position: relative;
 
     h3 {
         font-size: 1.8rem;
         color: #fff;
         font-weight: 600;
+        background-clip: text;
+        -webkit-background-clip: text;
     }
 
     &::-webkit-scrollbar {
@@ -411,34 +414,22 @@ export const LevelContent = styled.div`
 `;
 
 export const LevelCard = styled.div<{ isActive?: boolean; isCompleted?: boolean }>`
-    background: ${props => props.isActive ? 'rgba(167, 139, 250, 0.15)' : 'rgba(255, 255, 255, 0.07)'};
-    border: 1px solid ${props => props.isActive ? '#a78bfa' : 'rgba(255, 255, 255, 0.1)'};
+    background: ${(props) => (props.isActive ? "rgba(167, 139, 250, 0.15)" : "rgba(255, 255, 255, 0.07)")};
+    border: 1px solid ${(props) => (props.isActive ? "#a78bfa" : props.isCompleted ? "#10b981" : "rgba(255, 255, 255, 0.1)")};
     border-radius: 12px;
     padding: 1.5rem;
     margin: 1rem 0;
     position: relative;
-    opacity: ${props => props.isCompleted ? 1 : 0.9};
+    opacity: ${(props) => (props.isCompleted ? 1 : 0.9)};
     transition: all 0.3s ease;
 
     &:hover {
         transform: translateY(-2px);
-        background: ${props => props.isActive ? 'rgba(167, 139, 250, 0.2)' : 'rgba(255, 255, 255, 0.1)'};
-    }
-
-    &::before {
-        content: '';
-        position: absolute;
-        left: 0;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 4px;
-        height: 60%;
-        background: ${props => props.isActive ? '#a78bfa' : props.isCompleted ? '#10b981' : 'rgba(255, 255, 255, 0.3)'};
-        border-radius: 2px;
+        background: ${(props) => (props.isActive ? "rgba(167, 139, 250, 0.2)" : "rgba(255, 255, 255, 0.1)")};
     }
 
     h5 {
-        color: ${props => props.isActive ? '#a78bfa' : props.isCompleted ? '#10b981' : '#fff'};
+        color: ${(props) => (props.isActive ? "#a78bfa" : props.isCompleted ? "#10b981" : "#fff")};
         font-size: 1.3rem;
         margin-bottom: 0.8rem;
         font-weight: 600;
@@ -457,6 +448,7 @@ export const LevelCard = styled.div<{ isActive?: boolean; isCompleted?: boolean 
         margin-top: 0.8rem;
         display: flex;
         align-items: center;
+        justify-content: space-between;
         gap: 1rem;
     }
 `;

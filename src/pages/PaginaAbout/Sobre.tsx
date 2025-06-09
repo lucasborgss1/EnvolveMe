@@ -43,11 +43,10 @@ export const Sobre: React.FC = () => {
                     <hr style={{ width: "50%" }} />
                     <S.StyledSectionsLeft>
                         <div>
-                            <SU.StyledFontH2>Como Funciona?</SU.StyledFontH2>
+                            <SU.StyledFontH2>Como Funciona?</SU.StyledFontH2>{" "}
                             <p>
-                                Todos os dias, o <strong>EvolveMe</strong> propõe <strong>9 missões personalizadas</strong>, divididas em três áreas essenciais:
+                                No <strong>EvolveMe</strong>, você pode criar até <strong>3 desafios por dia</strong> em cada uma das áreas essenciais:
                             </p>
-
                             <ul>
                                 <li>
                                     <strong>Físico:</strong> exercícios, saúde, bem-estar.
@@ -59,7 +58,7 @@ export const Sobre: React.FC = () => {
                                     <strong>Espiritual:</strong> meditação, gratidão, autoconhecimento.
                                 </li>
                             </ul>
-                            <p>Nosso algoritmo adapta as tarefas com base nos seus objetivos e progresso.</p>
+                            <p>Escolha seus desafios diários ou use nossas sugestões personalizadas!</p>
                         </div>
                         <div>
                             <CheckBoxInput task checked={checked1} description="Passear com o Cachorro" onChange={setChecked1} color="red" />
@@ -70,9 +69,11 @@ export const Sobre: React.FC = () => {
                     <hr style={{ width: "50%" }} />
                     <S.StyledSectionsRight>
                         <div>
+                            {" "}
                             <SU.StyledFontH2>Gamificação que Motiva</SU.StyledFontH2>
                             <p>
-                                Ganhe pontos de experiência (XP), suba de nível e desbloqueie conquistas. Transforme sua evolução em uma aventura emocionante!
+                                Ganhe 15 XP por desafio concluído e bônus por criar seus próprios desafios. Suba de nível e transforme sua evolução em uma
+                                aventura emocionante!
                             </p>
                         </div>
                     </S.StyledSectionsRight>
