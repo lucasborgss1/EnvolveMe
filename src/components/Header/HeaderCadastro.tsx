@@ -8,7 +8,7 @@ export const HeaderCadastro: React.FC = () => {
             <div className="header">
                 <Link to={{ pathname: "/" }}>
                     <S.StyledLogo>
-                        <img src="/src/aesthetic-landscape-reflection-background-hd-wallpaper-sr10012410.jpg" alt="" />
+                        <img src="/aesthetic-landscape-reflection-background-hd-wallpaper-sr10012410.jpg" alt="" />
                         <SU.StyledFontH1>EnvolveMe</SU.StyledFontH1>
                     </S.StyledLogo>
                 </Link>
