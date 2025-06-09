@@ -30,12 +30,7 @@ export const Sobre: React.FC = () => {
                     <SU.StyledCardAnimation style={{ width: "100%", height: "100vh" }}>
                         <SU.StyledFontH1>Bem-vindo ao EvolveMe</SU.StyledFontH1>
                         <p>Desenvolva corpo, mente e espírito em uma jornada gamificada de autodesenvolvimento.</p>
-                        <Button 
-                            variant="primary" 
-                            size="large" 
-                            onClick={handleButtonComecar}
-                            style={{ marginTop: "1rem" }}
-                        >
+                        <Button variant="primary" size="large" onClick={handleButtonComecar} style={{ marginTop: "1rem" }}>
                             Começar
                         </Button>
                     </SU.StyledCardAnimation>

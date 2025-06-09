@@ -1,20 +1,7 @@
-import React from 'react';
-import {
-    BarChart,
-    Bar,
-    XAxis,
-    YAxis,
-    CartesianGrid,
-    Tooltip,
-    Legend,
-    ResponsiveContainer,
-    LineChart,
-    Line,
-    AreaChart,
-    Area
-} from 'recharts';
-import type { RelatorioSemanal as RelatorioType } from '../../types/Desafio';
-import * as S from './styles';
+import React from "react";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line, AreaChart, Area } from "recharts";
+import type { RelatorioSemanal as RelatorioType } from "../../types/Desafio";
+import * as S from "./styles";
 
 interface RelatorioSemanalProps {
     relatorio: RelatorioType;
@@ -25,22 +12,22 @@ export const RelatorioSemanal: React.FC<RelatorioSemanalProps> = ({ relatorio })
     const dadosPorArea = Object.entries(relatorio.porArea).map(([area, info]) => ({
         area,
         concluidos: info.concluidos,
-        total: info.total
+        total: info.total,
     }));
 
     // Prepara dados para o gráfico de linha (streak)
     const dadosStreak = Object.entries(relatorio.streakAtual)
         .sort(([dataA], [dataB]) => new Date(dataA).getTime() - new Date(dataB).getTime())
         .map(([data, quantidade]) => ({
-            data: data.split('-').reverse().slice(0, 2).join('/'),
-            quantidade
+            data: data.split("-").reverse().slice(0, 2).join("/"),
+            quantidade,
         }));
 
     // Prepara dados para o gráfico de área (evolução mensal)
-    const dadosEvolucao = relatorio.evolucaoMensal.map(mes => ({
+    const dadosEvolucao = relatorio.evolucaoMensal.map((mes) => ({
         mes: mes.mes,
         concluidos: mes.concluidos,
-        total: mes.total
+        total: mes.total,
     }));
 
     return (
@@ -73,10 +60,11 @@ export const RelatorioSemanal: React.FC<RelatorioSemanalProps> = ({ relatorio })
                     <ResponsiveContainer width="100%" height={300}>
                         <BarChart data={dadosPorArea}>
                             <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis dataKey="area" />
-                            <YAxis />
-                            <Tooltip />
-                            <Legend />
+                            <XAxis dataKey="area" stroke="#bbb" /> {/* cor do texto eixo X */}
+                            <YAxis stroke="#bbb" /> {/* cor do texto eixo Y */}
+                            <Tooltip contentStyle={{ backgroundColor: "#333" }} labelStyle={{ color: "#ccc" }} itemStyle={{ color: "#eee" }} />
+                            {/* Tooltip com fundo escuro e texto claro */}
+                            <Legend wrapperStyle={{ color: "#bbb" }} /> {/* Legenda com texto mais claro */}
                             <Bar dataKey="concluidos" name="Concluídos" fill="#4caf50" />
                             <Bar dataKey="total" name="Total" fill="#2196f3" />
                         </BarChart>
@@ -88,17 +76,11 @@ export const RelatorioSemanal: React.FC<RelatorioSemanalProps> = ({ relatorio })
                     <ResponsiveContainer width="100%" height={300}>
                         <LineChart data={dadosStreak}>
                             <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis dataKey="data" />
-                            <YAxis />
-                            <Tooltip />
-                            <Legend />
-                            <Line
-                                type="monotone"
-                                dataKey="quantidade"
-                                name="Desafios Concluídos"
-                                stroke="#ff9800"
-                                strokeWidth={2}
-                            />
+                            <XAxis dataKey="data" stroke="#bbb" />
+                            <YAxis stroke="#bbb" />
+                            <Tooltip contentStyle={{ backgroundColor: "#333" }} labelStyle={{ color: "#ccc" }} itemStyle={{ color: "#eee" }} />
+                            <Legend wrapperStyle={{ color: "#bbb" }} />
+                            <Line type="monotone" dataKey="quantidade" name="Desafios Concluídos" stroke="#ff9800" strokeWidth={2} />
                         </LineChart>
                     </ResponsiveContainer>
                 </S.ChartContainer>
@@ -108,30 +90,16 @@ export const RelatorioSemanal: React.FC<RelatorioSemanalProps> = ({ relatorio })
                     <ResponsiveContainer width="100%" height={300}>
                         <AreaChart data={dadosEvolucao}>
                             <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis dataKey="mes" />
-                            <YAxis />
-                            <Tooltip />
-                            <Legend />
-                            <Area
-                                type="monotone"
-                                dataKey="concluidos"
-                                name="Desafios Concluídos"
-                                stroke="#8884d8"
-                                fill="#8884d8"
-                                fillOpacity={0.3}
-                            />
-                            <Area
-                                type="monotone"
-                                dataKey="total"
-                                name="Total de Desafios"
-                                stroke="#82ca9d"
-                                fill="#82ca9d"
-                                fillOpacity={0.3}
-                            />
+                            <XAxis dataKey="mes" stroke="#bbb" />
+                            <YAxis stroke="#bbb" />
+                            <Tooltip contentStyle={{ backgroundColor: "#333" }} labelStyle={{ color: "#ccc" }} itemStyle={{ color: "#eee" }} />
+                            <Legend wrapperStyle={{ color: "#bbb" }} />
+                            <Area type="monotone" dataKey="concluidos" name="Desafios Concluídos" stroke="#8884d8" fill="#8884d8" fillOpacity={0.3} />
+                            <Area type="monotone" dataKey="total" name="Total de Desafios" stroke="#82ca9d" fill="#82ca9d" fillOpacity={0.3} />
                         </AreaChart>
                     </ResponsiveContainer>
                 </S.ChartContainer>
             </S.ChartsGrid>
         </S.Section>
     );
-}; 
+};
