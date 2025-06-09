@@ -6,7 +6,7 @@ export const StyledBackground = styled.div`
     left: 0;
     height: 100vh;
     width: 100vw;
-    background-image: url("/src/assets/aesthetic-landscape-reflection-background-hd-wallpaper-sr10012410.jpg");
+    background-image: url("/src/aesthetic-landscape-reflection-background-hd-wallpaper-sr10012410.jpg");
     background-size: cover;
     background-position: center;
     z-index: -1;
@@ -28,7 +28,7 @@ export const StyledBackground2 = styled.div`
     left: 0;
     height: 100vh;
     width: 100vw;
-    background-image: url("/src/assets/aesthetic-landscape-reflection-background-hd-wallpaper-sr10012410.jpg");
+    background-image: url("/src/aesthetic-landscape-reflection-background-hd-wallpaper-sr10012410.jpg");
     background-size: cover;
     background-position: center;
     z-index: -1;

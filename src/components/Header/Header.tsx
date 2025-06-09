@@ -38,7 +38,7 @@ export const Header: React.FC = () => {
             <div className="header">
                 <a href="">
                     <S.StyledLogo>
-                        <img src="/src/assets/aesthetic-landscape-reflection-background-hd-wallpaper-sr10012410.jpg" alt="logo" />
+                        <img src="/src/aesthetic-landscape-reflection-background-hd-wallpaper-sr10012410.jpg" alt="logo" />
                         <SU.StyledFontH1>EnvolveMe</SU.StyledFontH1>
                     </S.StyledLogo>
                 </a>
